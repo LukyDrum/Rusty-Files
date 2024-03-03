@@ -111,6 +111,15 @@ impl Manager {
         }
     }
 
+    /// Moves to the parent directory
+    pub fn move_to_parent_directory(&mut self) -> () {
+        let parent_directory_opt = self.current_directory.parent();
+        match parent_directory_opt {
+            Some(dir) => self.change_directory(dir.to_path_buf()).unwrap(), // TODO: Handle Error
+            None => {}
+        };
+    }
+
     /// Returns a vector of Entry(ies) in the specified directory
     fn get_entries_in_directory(directory: PathBuf) -> Vec<Entry> {
         // Read the directory and convert each DirEntry to Entry

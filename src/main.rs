@@ -13,7 +13,7 @@ fn main() {
 
     println!("");
 
-    manager.change_directory(PathBuf::from("src")).unwrap();
+    manager.move_to_parent_directory();
     for entry in &manager.current_directory_entries {
         println!("{}", entry.filename());
     }
