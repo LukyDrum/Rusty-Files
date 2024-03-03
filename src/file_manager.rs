@@ -1,4 +1,5 @@
 use std::fs::{DirEntry, Metadata, read_dir};
+use std::io;
 use std::path::PathBuf;
 use std::time::SystemTime;
 use std::env::current_dir;
@@ -11,7 +12,6 @@ pub enum EntryType {
 
 /// Represents a single file or directory. Includes detailed information about the entry.
 pub struct Entry {
-    pub name: String,
     pub path: PathBuf,
     pub size: u64, // In bytes
     pub entry_type: EntryType,
@@ -24,6 +24,12 @@ impl Entry {
     pub fn from(dir_entry: DirEntry, original_path: PathBuf) -> Entry {
         // Get name of the entry
         let name: String = dir_entry.file_name().into_string().unwrap();
+
+        // Check if it is a hidden file/directory (if it starts with '.')
+        let is_hidden: bool = name.starts_with('.');
+
+        let mut full_path: PathBuf = original_path.clone();
+        full_path.push(name);
         
         // Get metadata - TODO: Handle possible error
         let entry_metadata: Metadata = dir_entry.metadata().unwrap();
@@ -44,12 +50,8 @@ impl Entry {
         // Get the SystemTime of last modification or set it to UNIX_EPOCH
         let last_modified: SystemTime = entry_metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
 
-        // Check if it is a hidden file/directory (if it starts with '.')
-        let is_hidden: bool = name.starts_with('.');
-
         return Entry {
-            name: name,
-            path: original_path,
+            path: full_path,
             size: entry_metadata.len(),
             entry_type: entry_type,
             last_modified: last_modified,
@@ -80,4 +82,9 @@ impl Manager {
         };
 
     }
+
+    // Changes the current directory and sets new directory entries
+    // pub fn change_directory(&mut self, new_directory: PathBuf) -> Result<(), io::Error> {
+        
+    // }
 }

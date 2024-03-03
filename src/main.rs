@@ -6,6 +6,6 @@ fn main() {
     let manager: Manager = Manager::new();
     println!("{:?}", manager.current_directory);
     for entry in &manager.current_directory_entries {
-        println!("{} {}B", entry.name, entry.size);
+        println!("{}", entry.path.to_str().unwrap());
     }
 }
