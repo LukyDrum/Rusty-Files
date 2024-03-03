@@ -1,3 +1,8 @@
+mod file_manager;
+
+use file_manager::Manager;
+
 fn main() {
-    println!("Hello, world!");
+    let manager: Manager = Manager::new();
+    println!("{:?}", manager.current_directory);
 }
