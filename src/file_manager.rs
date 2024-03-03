@@ -1,6 +1,7 @@
 use std::fs::{DirEntry, Metadata, read_dir};
 use std::io;
 use std::path::PathBuf;
+use std::str::FromStr;
 use std::time::SystemTime;
 use std::env::current_dir;
 
@@ -57,6 +58,11 @@ impl Entry {
             last_modified: last_modified,
             is_hidden: is_hidden,
         };
+    }
+
+    pub fn filename(&self) -> String {
+        // It is safe to unwrap as we will never ask for the name of root directory
+        self.path.file_name().unwrap().to_os_string().into_string().unwrap()
     }
 }
 
