@@ -11,11 +11,11 @@ pub enum EntryType {
 
 /// Represents a single file or directory. Includes detailed information about the entry.
 pub struct Entry {
-    name: String,
-    path: PathBuf,
-    size: u64, // In bytes
-    entry_type: EntryType,
-    last_modified: SystemTime,
+    pub name: String,
+    pub path: PathBuf,
+    pub size: u64, // In bytes
+    pub entry_type: EntryType,
+    pub last_modified: SystemTime,
 }
 
 impl Entry {
@@ -60,6 +60,7 @@ pub struct Manager {
 }
 
 impl Manager {
+    /// Constructs a new Manager instance with entries of the current directory
     pub fn new() -> Manager {
         // Get current directory, TODO: Handle errors
         let cur_dir: PathBuf = current_dir().unwrap();
