@@ -16,6 +16,7 @@ pub struct Entry {
     pub size: u64, // In bytes
     pub entry_type: EntryType,
     pub last_modified: SystemTime,
+    pub is_hidden: bool,
 }
 
 impl Entry {
@@ -43,12 +44,16 @@ impl Entry {
         // Get the SystemTime of last modification or set it to UNIX_EPOCH
         let last_modified: SystemTime = entry_metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
 
+        // Check if it is a hidden file/directory (if it starts with '.')
+        let is_hidden: bool = name.starts_with('.');
+
         return Entry {
             name: name,
             path: original_path,
             size: entry_metadata.len(),
             entry_type: entry_type,
-            last_modified: last_modified
+            last_modified: last_modified,
+            is_hidden: is_hidden,
         };
     }
 }
@@ -73,5 +78,6 @@ impl Manager {
             current_directory: cur_dir,
             current_directory_entries: entries,
         };
+
     }
 }
