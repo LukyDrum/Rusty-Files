@@ -1,10 +1,11 @@
 use std::fs::{DirEntry, Metadata, read_dir};
-use std::io;
+use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
-use std::str::FromStr;
 use std::time::SystemTime;
 use std::env::current_dir;
 
+
+type IOError = Error;
 
 /// Represents the type of the entry, either File or Directory or Symbolic Link (symlink).
 pub enum EntryType {
@@ -78,9 +79,7 @@ impl Manager {
         // Get current directory, TODO: Handle errors
         let cur_dir: PathBuf = current_dir().unwrap();
         // Read the current directory and convert each DirEntry to Entry
-        let entries: Vec<Entry> = read_dir(cur_dir.as_path()).unwrap().map(
-            |dir_entry: Result<DirEntry, std::io::Error>| Entry::from(dir_entry.unwrap(), cur_dir.clone())
-        ).collect();
+        let entries: Vec<Entry> = Manager::get_entries_in_directory(cur_dir.clone());
 
         return Manager {
             current_directory: cur_dir,
@@ -89,8 +88,35 @@ impl Manager {
 
     }
 
-    // Changes the current directory and sets new directory entries
-    // pub fn change_directory(&mut self, new_directory: PathBuf) -> Result<(), io::Error> {
-        
-    // }
+    /// Changes the current directory and sets new directory entries
+    pub fn change_directory(&mut self, new_directory: PathBuf) -> Result<(), IOError> {
+        // Get the full path of the directory
+        let full_new_directory_path = {
+            if new_directory.is_absolute() {
+                new_directory
+            }
+            else {
+                self.current_directory.join(new_directory)
+            }
+        };
+
+        // Check if the path is really a directory
+        if full_new_directory_path.is_dir() {
+            self.current_directory_entries = Manager::get_entries_in_directory(full_new_directory_path);
+
+            return Ok(());
+        }
+        else {
+            return Err(IOError::new(ErrorKind::NotFound, "Directory not found!"));
+        }
+    }
+
+    /// Returns a vector of Entry(ies) in the specified directory
+    fn get_entries_in_directory(directory: PathBuf) -> Vec<Entry> {
+        // Read the directory and convert each DirEntry to Entry
+        read_dir(directory.as_path()).unwrap().map(
+            |dir_entry: Result<DirEntry, std::io::Error>| Entry::from(dir_entry.unwrap(), directory.clone())
+        ).collect()
+    }
 }
+
