@@ -88,6 +88,20 @@ impl Manager {
 
     }
 
+    /// Construct a new Manager instance with entries and current directory set to the argument path
+    pub fn with_directory(directory: PathBuf) -> Result<Manager, IOError> {
+        let mut manager = Manager {
+            current_directory: PathBuf::new(),
+            current_directory_entries: Vec::new(),
+        };
+
+        let result = manager.change_directory(directory);
+        match result {
+            Ok(_) => return Ok(manager),
+            Err(err) => return Err(err),
+        };
+    }
+
     /// Changes the current directory and sets new directory entries
     pub fn change_directory(&mut self, new_directory: PathBuf) -> Result<(), IOError> {
         // Get the full path of the directory
