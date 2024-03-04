@@ -8,11 +8,13 @@ use std::env::current_dir;
 type IOError = Error;
 
 /// Represents the type of the entry, either File or Directory or Symbolic Link (symlink).
+#[derive(Clone)]
 pub enum EntryType {
     File, Directory, Symlink
 }
 
 /// Represents a single file or directory. Includes detailed information about the entry.
+#[derive(Clone)]
 pub struct Entry {
     pub path: PathBuf,
     pub size: u64, // In bytes
