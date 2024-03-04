@@ -20,7 +20,6 @@ pub struct Entry {
     pub size: u64, // In bytes
     pub entry_type: EntryType,
     pub last_modified: SystemTime,
-    pub is_hidden: bool,
 }
 
 impl Entry {
@@ -28,9 +27,6 @@ impl Entry {
     pub fn from(dir_entry: DirEntry, original_path: PathBuf) -> Entry {
         // Get name of the entry
         let name: String = dir_entry.file_name().into_string().unwrap();
-
-        // Check if it is a hidden file/directory (if it starts with '.')
-        let is_hidden: bool = name.starts_with('.');
 
         let mut full_path: PathBuf = original_path.clone();
         full_path.push(name);
@@ -59,7 +55,6 @@ impl Entry {
             size: entry_metadata.len(),
             entry_type: entry_type,
             last_modified: last_modified,
-            is_hidden: is_hidden,
         };
     }
 
@@ -67,6 +62,12 @@ impl Entry {
     pub fn filename(&self) -> String {
         // It is safe to unwrap as we will never ask for the name of root directory
         self.path.file_name().unwrap().to_os_string().into_string().unwrap()
+    }
+
+    /// Get if the file is hidden
+    pub fn is_hidden(&self) -> bool {
+        // Check if the filename starts with a dot
+        self.filename().starts_with('.')
     }
 
     /// Rename this Entry
