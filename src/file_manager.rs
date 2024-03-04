@@ -1,4 +1,4 @@
-use std::fs::{DirEntry, Metadata, read_dir};
+use std::fs::{DirEntry, Metadata, read_dir, rename};
 use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
 use std::time::SystemTime;
@@ -63,9 +63,25 @@ impl Entry {
         };
     }
 
+    /// Get the filename of this entry
     pub fn filename(&self) -> String {
         // It is safe to unwrap as we will never ask for the name of root directory
         self.path.file_name().unwrap().to_os_string().into_string().unwrap()
+    }
+
+    /// Rename this Entry
+    pub fn rename(&mut self, new_name: String) -> Result<(), IOError> {
+        // Get new full path - it is safe to unwrap as we will never try to rename a root directory
+        let new_path: PathBuf = self.path.parent().unwrap().join(PathBuf::from(new_name));
+        // Rename the file/directory
+        let rename_result = rename(&self.path, &new_path);
+        match rename_result {
+            Ok(_) => {
+                self.path = new_path;
+                return Ok(());
+            },
+            Err(err) => return Err(err)
+        };
     }
 }
 
