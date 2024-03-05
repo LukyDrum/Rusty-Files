@@ -1,4 +1,4 @@
-use std::fs::{DirEntry, Metadata, read_dir, rename};
+use std::fs::{DirEntry, Metadata, read_dir, rename, remove_dir_all, remove_file};
 use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
 use std::time::SystemTime;
@@ -98,7 +98,7 @@ impl Manager {
         // Get current directory, TODO: Handle errors
         let cur_dir: PathBuf = current_dir().unwrap();
         // Read the current directory and convert each DirEntry to Entry
-        let entries: Vec<Entry> = Manager::get_entries_in_directory(cur_dir.clone());
+        let entries: Vec<Entry> = Manager::get_entries_in_directory(&cur_dir);
 
         return Manager {
             current_directory: cur_dir,
@@ -135,7 +135,7 @@ impl Manager {
 
         // Check if the path is really a directory
         if full_new_directory_path.is_dir() {
-            self.current_directory_entries = Manager::get_entries_in_directory(full_new_directory_path);
+            self.current_directory_entries = Manager::get_entries_in_directory(&full_new_directory_path);
 
             return Ok(());
         }
@@ -154,11 +154,30 @@ impl Manager {
     }
 
     /// Returns a vector of Entry(ies) in the specified directory
-    fn get_entries_in_directory(directory: PathBuf) -> Vec<Entry> {
+    pub fn get_entries_in_directory(directory: &PathBuf) -> Vec<Entry> {
         // Read the directory and convert each DirEntry to Entry
         read_dir(directory.as_path()).unwrap().map(
             |dir_entry: Result<DirEntry, std::io::Error>| Entry::from(dir_entry.unwrap(), directory.clone())
         ).collect()
+    }
+
+    /// Removes a file or directory (in case of directory deletes all of the contents as well)
+    pub fn delete(&mut self, entry: &Entry) -> Result<(), IOError> {
+        let path = &entry.path;
+        let result = match entry.entry_type {
+            // Directory
+            EntryType::Directory => remove_dir_all(path),
+            // File
+            EntryType::File | EntryType::Symlink => return remove_file(path)
+        };
+
+        match result {
+            Ok(_) => {
+                self.current_directory_entries = Manager::get_entries_in_directory(&self.current_directory);
+                Ok(())
+            },
+            Err(err) => Err(err)
+        }
     }
 }
 
