@@ -179,5 +179,13 @@ impl Manager {
             Err(err) => Err(err)
         }
     }
+
+    pub fn filenames(&self) -> Vec<String> {
+        let mut files: Vec<String> = Vec::new();
+        for entry in &self.current_directory_entries {
+            files.push(entry.filename());
+        }
+        files
+    }
 }
 

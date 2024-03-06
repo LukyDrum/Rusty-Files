@@ -10,6 +10,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
+use file_manager::Manager;
 use ratatui::{prelude::*, widgets::*};
 
 fn main() -> io::Result<()> {
@@ -17,9 +18,11 @@ fn main() -> io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
+    let mut manager = Manager::new();
+
     let mut should_quit = false;
     while !should_quit {
-        terminal.draw(ui)?;
+        terminal.draw(|frame| ui(frame, &mut manager))?;
         
         should_quit = handle_events()?;
     }

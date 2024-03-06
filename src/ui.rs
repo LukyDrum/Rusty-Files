@@ -1,6 +1,7 @@
 use ratatui::{prelude::*, widgets::*};
+use crate::file_manager::*;
 
-pub fn ui(frame: &mut Frame) {
+pub fn ui(frame: &mut Frame, manager: &mut Manager) {
     let main_layout = Layout::new(
         Direction::Vertical,
         [
@@ -17,7 +18,7 @@ pub fn ui(frame: &mut Frame) {
 
     let mut state = ListState::default().with_selected(Some(1));
 
-    let items = ["Item 1", "Item 2", "Item 3"];
+    let items = manager.filenames();
     let list = List::new(items)
         .block(Block::default().title(" Current directory ").borders(Borders::ALL))
         .style(Style::default())
