@@ -24,6 +24,8 @@ fn main() -> io::Result<()> {
     let mut ui_manager: UIManager = UIManager::new(manager);
 
     while !ui_manager.should_quit {
+        ui_manager.update();
+
         terminal.draw(|frame| ui_manager.ui(frame))?;
         
         let ui_event = handle_events()?;
