@@ -2,6 +2,15 @@ use ratatui::{prelude::*, widgets::*};
 use crate::file_manager::*;
 
 
+/// Describes events that can happen in the UI
+pub enum UIEvent {
+    Up, // Up key
+    Down, // Down key
+    In, // Right key = move into directory
+    Out, // Left key = move out of directory
+    ToggleHidden, // H key = toggle hidden files
+}
+
 /// Takes care of the UI and acts as the interface between User and File Manager
 pub struct UIManager {
     file_manager: Manager,
