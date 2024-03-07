@@ -74,7 +74,7 @@ impl UIManager {
     fn get_filenames_to_show(&self) -> Vec<String> {
         let filenames: Vec<String> = self.current_entries.iter().map(|entry| entry.filename()).collect();
 
-        if !self.show_hidden {
+        if self.show_hidden {
             filenames
         }
         else {
@@ -85,9 +85,21 @@ impl UIManager {
         }
     }
 
+    fn get_number_of_showed_entries(&self) -> usize {
+        if self.show_hidden {
+            self.current_entries.len()
+        }
+        else {
+            self.current_entries
+                .iter()
+                .filter(|entry| !entry.is_hidden())
+                .count()
+        }
+    }
+
     fn increase_index(&mut self) -> () {
         self.selection_index += 1;
-        self.selection_index = self.selection_index % self.current_entries.len();
+        self.selection_index = self.selection_index % self.get_number_of_showed_entries();
     }
 
     fn decrease_index(&mut self) -> () {
@@ -95,7 +107,7 @@ impl UIManager {
             self.selection_index -= 1;
         }
         else {
-            self.selection_index = self.current_entries.len() - 1;
+            self.selection_index = self.get_number_of_showed_entries() - 1;
         }
     }
 
