@@ -43,7 +43,7 @@ impl UIManager {
     
         let mut state = ListState::default().with_selected(Some(self.selection_index));
     
-        let items = self.file_manager.filenames();
+        let items = self.get_entries_to_show();
         let list = List::new(items)
             .block(Block::default().title(" Current directory ").borders(Borders::ALL))
             .style(Style::default())
@@ -56,5 +56,16 @@ impl UIManager {
 
     pub fn toggle_show_hidden(&mut self) -> () {
         self.show_hidden = !self.show_hidden;
+    }
+
+    fn get_entries_to_show(&self) -> Vec<String> {
+        let filenames = self.file_manager.filenames();
+
+        if !self.show_hidden {
+            filenames
+        }
+        else {
+            filenames.into_iter().filter(|f| !f.starts_with('.') ).collect()
+        }
     }
 }
