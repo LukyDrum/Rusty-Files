@@ -9,6 +9,8 @@ pub enum UIEvent {
     In, // Right key = move into directory
     Out, // Left key = move out of directory
     ToggleHidden, // H key = toggle hidden files
+    None, // When nothing happens
+    Quit, // Q key = quit app
 }
 
 /// Takes care of the UI and acts as the interface between User and File Manager

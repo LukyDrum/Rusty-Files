@@ -1,7 +1,7 @@
 mod file_manager;
 mod ui;
 
-use crate::ui::UIManager;
+use crate::ui::{UIManager, UIEvent};
 
 use std::io::{self, stdout};
 
@@ -25,7 +25,7 @@ fn main() -> io::Result<()> {
     while !should_quit {
         terminal.draw(|frame| ui_manager.ui(frame))?;
         
-        should_quit = handle_events()?;
+        let ui_event = handle_events()?;
     }
 
     disable_raw_mode()?;
@@ -33,13 +33,22 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn handle_events() -> io::Result<bool> {
+fn handle_events() -> Result<UIEvent, std::io::Error>{
     if event::poll(std::time::Duration::from_millis(50))? {
         if let Event::Key(key) = event::read()? {
-            if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                return Ok(true);
+            if key.kind == event::KeyEventKind::Press {
+                return match key.code {
+                    KeyCode::Char('q') => Ok(UIEvent::Quit),
+                    KeyCode::Up => Ok(UIEvent::Up),
+                    KeyCode::Down => Ok(UIEvent::Down),
+                    KeyCode::Left => Ok(UIEvent::Out),
+                    KeyCode::Right => Ok(UIEvent::In),
+                    KeyCode::Char('h') => Ok(UIEvent::ToggleHidden),
+                    _ => Ok(UIEvent::None) // For all other cases
+                }
             }
         }
     }
-    Ok(false)
+
+    Ok(UIEvent::None)
 }
