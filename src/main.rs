@@ -11,22 +11,26 @@ use crossterm::{
     ExecutableCommand,
 };
 use file_manager::Manager;
-use ratatui::{prelude::*, widgets::*};
+use ratatui::prelude::*;
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
-    let manager = Manager::new();
-    let ui_manager: UIManager = UIManager::new(manager);
+    // Actual code starts
 
-    let mut should_quit = false;
-    while !should_quit {
+    let manager = Manager::new();
+    let mut ui_manager: UIManager = UIManager::new(manager);
+
+    while !ui_manager.should_quit {
         terminal.draw(|frame| ui_manager.ui(frame))?;
         
         let ui_event = handle_events()?;
+        ui_manager.proccess_ui_event(ui_event);
     }
+
+    // Actual code ends
 
     disable_raw_mode()?;
     stdout().execute(LeaveAlternateScreen)?;

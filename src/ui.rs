@@ -15,6 +15,7 @@ pub enum UIEvent {
 
 /// Takes care of the UI and acts as the interface between User and File Manager
 pub struct UIManager {
+    pub should_quit: bool,
     file_manager: Manager,
     selected_entries: Vec<Entry>,
     selection_index: usize,
@@ -23,7 +24,7 @@ pub struct UIManager {
 
 impl UIManager {
     pub fn new(manager: Manager) -> UIManager {
-        UIManager { file_manager: manager, selected_entries: Vec::new(), selection_index: 0, show_hidden: false }
+        UIManager { should_quit: false, file_manager: manager, selected_entries: Vec::new(), selection_index: 0, show_hidden: false }
     }
 
     pub fn ui(&self, frame: &mut Frame) -> () {
@@ -54,7 +55,7 @@ impl UIManager {
         frame.render_stateful_widget(list, main_layout[1], &mut state);
     }
 
-    pub fn toggle_show_hidden(&mut self) -> () {
+    fn toggle_show_hidden(&mut self) -> () {
         self.show_hidden = !self.show_hidden;
     }
 
@@ -66,6 +67,14 @@ impl UIManager {
         }
         else {
             filenames.into_iter().filter(|f| !f.starts_with('.') ).collect()
+        }
+    }
+
+    pub fn proccess_ui_event(&mut self, event: UIEvent) -> () {
+        match event {
+            UIEvent::Quit => self.should_quit = true,
+            UIEvent::ToggleHidden => self.toggle_show_hidden(),
+            _ => {}
         }
     }
 }
