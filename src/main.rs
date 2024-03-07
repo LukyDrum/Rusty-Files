@@ -1,7 +1,7 @@
 mod file_manager;
 mod ui;
 
-use crate::ui::ui;
+use crate::ui::UIManager;
 
 use std::io::{self, stdout};
 
@@ -18,11 +18,12 @@ fn main() -> io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
-    let mut manager = Manager::new();
+    let manager = Manager::new();
+    let ui_manager: UIManager = UIManager::new(manager);
 
     let mut should_quit = false;
     while !should_quit {
-        terminal.draw(|frame| ui(frame, &mut manager))?;
+        terminal.draw(|frame| ui_manager.ui(frame))?;
         
         should_quit = handle_events()?;
     }
