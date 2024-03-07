@@ -7,11 +7,12 @@ pub struct UIManager {
     file_manager: Manager,
     selected_entries: Vec<Entry>,
     selection_index: usize,
+    show_hidden: bool,
 }
 
 impl UIManager {
     pub fn new(manager: Manager) -> UIManager {
-        UIManager { file_manager: manager, selected_entries: Vec::new(), selection_index: 0 }
+        UIManager { file_manager: manager, selected_entries: Vec::new(), selection_index: 0, show_hidden: false }
     }
 
     pub fn ui(&self, frame: &mut Frame) -> () {
@@ -40,5 +41,9 @@ impl UIManager {
             .direction(ListDirection::TopToBottom);
     
         frame.render_stateful_widget(list, main_layout[1], &mut state);
+    }
+
+    pub fn toggle_show_hidden(&mut self) -> () {
+        self.show_hidden = !self.show_hidden;
     }
 }
